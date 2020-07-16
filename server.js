@@ -16,6 +16,13 @@ function getRandomColor() {
   return color;
 }
 
+function nocache(req, res, next) {
+  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  res.header('Expires', '-1');
+  res.header('Pragma', 'no-cache');
+  next();
+}
+
 
 
 
@@ -36,7 +43,7 @@ app.get("/", (request, response) => {
   response.sendFile(__dirname + "/views/index.html");
 });
 
-app.get("/image", (request, response) => {
+app.get("/image", nocache,(request, response) => {
   const width = 1200
 const height = 630
 
@@ -44,7 +51,7 @@ const canvas = createCanvas(width, height)
 const context = canvas.getContext('2d')
 const color=getRandomColor();
 
-context.fillStyle = 'color
+context.fillStyle = color;  
 context.fillRect(0, 0, width, height)
 
 context.font = 'bold 70pt Menlo'
