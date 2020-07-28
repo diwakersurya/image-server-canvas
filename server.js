@@ -71,13 +71,14 @@ context.fillStyle = '#fff'
 context.font = 'bold 30pt Menlo'
 context.fillText('diwakersurya', 600, 530)
   
-   context.beginPath();
-        context.arc(125,120,100,0,2*Math.PI);
+context.beginPath();
 
-        // you clip the context
-        context.clip();
+
 const myimg = await loadImage('https://avatars3.githubusercontent.com/u/7386665?s=400&u=aaff658cd860d5f886775a293c58e73fa57e7bf9&v=4')
-context.drawImage(myimg, 0, 0)
+context.arc(600,200,200,0,2*Math.PI);
+  context.arc.stroke="red"
+context.clip();
+context.drawImage(myimg, , 0)
 const buffer = canvas.toBuffer('image/png')
 response.contentType('image/jpeg');
 response.send(buffer);
