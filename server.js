@@ -33,21 +33,23 @@ app.get("/", (request, response) => {
 });
 
 app.get("/image", nocache,async(request, response) => {
-  const width = 1200
+  /* width and height of canvas*/
+const width = 1200 
 const height = 630
 
 const canvas = createCanvas(width, height)
 const context = canvas.getContext('2d') 
+/* random background color*/
 const bgColor=getRandomColor();
-  const textColor=getRandomColor();
 
 context.fillStyle = bgColor;  
 context.fillRect(0, 0, width, height)
 
+/* setting the font and text alignment*/
 context.font = 'bold 70pt Menlo'
 context.textAlign = 'center'
 context.textBaseline = 'top'
-//context.fillStyle = textColor;
+  
 const randomIndex=getRandomInt(0,50);
 const language=Object.keys(messages)[randomIndex];
 const text = messages[language]
