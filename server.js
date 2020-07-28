@@ -6,6 +6,7 @@
 const express = require("express");
 const app = express();
 const { createCanvas, loadImage } = require('canvas');
+const messages = require("./messages");
 //https://stackoverflow.com/questions/1484506/random-color-generator
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
@@ -14,6 +15,11 @@ function getRandomColor() {
     color += letters[Math.floor(Math.random() * 16)];
   }
   return color;
+}
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
 function nocache(req, res, next) {
@@ -24,15 +30,6 @@ function nocache(req, res, next) {
 }
 
 
-
-
-
-// our default array of dreams
-const dreams = [
-  "Find and count some sheep",
-  "Climb a really tall mountain",
-  "Wash the dishes"
-];
 
 // make all the files in 'public' available
 // https://expressjs.com/en/starter/static-files.html
@@ -48,37 +45,36 @@ app.get("/image", nocache,(request, response) => {
 const height = 630
 
 const canvas = createCanvas(width, height)
-const context = canvas.getContext('2d')
-const color=getRandomColor();
+const context = canvas.getContext('2d') 
+const bgColor=getRandomColor();
+  const textColor=getRandomColor();
 
-context.fillStyle = color;  
+context.fillStyle = bgColor;  
 context.fillRect(0, 0, width, height)
 
 context.font = 'bold 70pt Menlo'
 context.textAlign = 'center'
 context.textBaseline = 'top'
-context.fillStyle = '#3574d4'
-
-const text = 'Hello, World!'
+//context.fillStyle = textColor;
+const randomIndex=getRandomInt(0,50);
+const language=Object.keys(messages)[randomIndex];
+const text = messages[language]
 
 const textWidth = context.measureText(text).width
-context.fillRect(600 - textWidth / 2 - 10, 170 - 5, textWidth + 20, 120)
+//context.fillRect(600 - textWidth / 2 - 10, 170 - 5, textWidth + 20, 120)
 context.fillStyle = '#fff'
 context.fillText(text, 600, 170)
+context.fillText(`(${language})`, 600, 250)
 
 context.fillStyle = '#fff'
 context.font = 'bold 30pt Menlo'
 context.fillText('diwakersurya', 600, 530)
-  const buffer = canvas.toBuffer('image/png')
-  response.contentType('image/jpeg');
-  response.send(buffer);
+  
+const buffer = canvas.toBuffer('image/png')
+response.contentType('image/jpeg');
+response.send(buffer);
 });
 
-// send the default array of dreams to the webpage
-app.get("/dreams", (request, response) => {
-  // express helps us take JS objects and send them as JSON
-  response.json(dreams);
-});
 
 // listen for requests :)
 const listener = app.listen(process.env.PORT, () => {
