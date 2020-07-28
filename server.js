@@ -75,10 +75,12 @@ context.beginPath();
 
 
 const myimg = await loadImage('https://avatars3.githubusercontent.com/u/7386665?s=400&u=aaff658cd860d5f886775a293c58e73fa57e7bf9&v=4')
-context.arc(600,200,200,0,2*Math.PI);
-  context.arc.stroke="red"
+context.arc(600,500,50,0,2*Math.PI);
 context.clip();
-context.drawImage(myimg, , 0)
+context.drawImage(myimg, 530, 450,myimg.width * 0.3, myimg.height * 0.3)
+  
+  
+  
 const buffer = canvas.toBuffer('image/png')
 response.contentType('image/jpeg');
 response.send(buffer);
