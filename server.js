@@ -40,7 +40,7 @@ app.get("/", (request, response) => {
   response.sendFile(__dirname + "/views/index.html");
 });
 
-app.get("/image", nocache,(request, response) => {
+app.get("/image", nocache,async(request, response) => {
   const width = 1200
 const height = 630
 
@@ -64,12 +64,20 @@ const textWidth = context.measureText(text).width
 //context.fillRect(600 - textWidth / 2 - 10, 170 - 5, textWidth + 20, 120)
 context.fillStyle = '#fff'
 context.fillText(text, 600, 170)
-context.fillText(`(${language})`, 600, 250)
+context.font = 'bold 15pt Menlo'
+context.fillText(`(${language})`, 600, 280)
 
 context.fillStyle = '#fff'
 context.font = 'bold 30pt Menlo'
 context.fillText('diwakersurya', 600, 530)
   
+   context.beginPath();
+        context.arc(125,120,100,0,2*Math.PI);
+
+        // you clip the context
+        context.clip();
+const myimg = await loadImage('https://avatars3.githubusercontent.com/u/7386665?s=400&u=aaff658cd860d5f886775a293c58e73fa57e7bf9&v=4')
+context.drawImage(myimg, 0, 0)
 const buffer = canvas.toBuffer('image/png')
 response.contentType('image/jpeg');
 response.send(buffer);
