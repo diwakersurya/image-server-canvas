@@ -49,13 +49,12 @@ context.fillRect(0, 0, width, height)
 context.font = 'bold 70pt Menlo'
 context.textAlign = 'center'
 context.textBaseline = 'top'
-  
+/* getting randome message if random language*/
 const randomIndex=getRandomInt(0,50);
 const language=Object.keys(messages)[randomIndex];
 const text = messages[language]
-
 const textWidth = context.measureText(text).width
-//context.fillRect(600 - textWidth / 2 - 10, 170 - 5, textWidth + 20, 120)
+/*drawing text on canvas*/
 context.fillStyle = '#fff'
 context.fillText(text, 600, 170)
 context.font = 'bold 15pt Menlo'
@@ -67,14 +66,13 @@ context.fillText('diwakersurya', 600, 540)
   
 context.beginPath();
 
-
+/* loading image from github url*/
 const myimg = await loadImage('https://avatars3.githubusercontent.com/u/7386665?s=400&u=aaff658cd860d5f886775a293c58e73fa57e7bf9&v=4')
 context.arc(600,500,50,0,2*Math.PI);
 context.clip();
 context.drawImage(myimg, 530, 450,myimg.width * 0.3, myimg.height * 0.3)
   
-  
-  
+/*sending as response to client*/
 const buffer = canvas.toBuffer('image/png')
 response.contentType('image/jpeg');
 response.send(buffer);
