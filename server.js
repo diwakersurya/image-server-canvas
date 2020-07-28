@@ -1,8 +1,3 @@
-// server.js
-// where your node app starts
-
-// we've started you off with Express (https://expressjs.com/)
-// but feel free to use whatever libraries or frameworks you'd like through `package.json`.
 const express = require("express");
 const app = express();
 const { createCanvas, loadImage } = require('canvas');
@@ -16,6 +11,7 @@ function getRandomColor() {
   }
   return color;
 }
+
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -29,10 +25,6 @@ function nocache(req, res, next) {
   next();
 }
 
-
-
-// make all the files in 'public' available
-// https://expressjs.com/en/starter/static-files.html
 app.use(express.static("public"));
 
 // https://expressjs.com/en/starter/basic-routing.html
@@ -69,7 +61,7 @@ context.fillText(`(${language})`, 600, 280)
 
 context.fillStyle = '#fff'
 context.font = 'bold 30pt Menlo'
-context.fillText('diwakersurya', 600, 530)
+context.fillText('diwakersurya', 600, 540)
   
 context.beginPath();
 
