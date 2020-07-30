@@ -143,7 +143,8 @@ var text = new fabric.Textbox('Hello world From Fabric JS', {
   canvas.add(text)
 var dataURL = canvas.toDataURL({
   format: 'png',
-  quality: 0.8
+  quality: 1,
+  enableRetinaScaling:true
 });
 
   /*sending as response to client*/
