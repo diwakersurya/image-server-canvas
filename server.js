@@ -33,17 +33,18 @@ app.get("/", (request, response) => {
 });
 
 app.get("/image", nocache, async (request, response) => {
-  /* width and height of canvas*/
-  const width = 1200;
-  const height = 630;
-
-  const canvas = createCanvas(width, height);
+  const {
+    user="user"/*username*/,
+    avatarUrl=`https://github.com/${user}.png`/*avatar url*/,
+    bg=getRandomColor()/* canvas background*/,
+    w=1200/*image width*/,
+    h=630/*image height*/
+  }=request.query;
+  const canvas = createCanvas(w, h);
   const context = canvas.getContext("2d");
-  /* random background color*/
-  const bgColor = getRandomColor();
 
-  context.fillStyle = bgColor;
-  context.fillRect(0, 0, width, height);
+  context.fillStyle = bg;
+  context.fillRect(0, 0, w, h);
 
   /* setting the font and text alignment*/
   context.font = "bold 70pt Menlo";
