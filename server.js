@@ -63,14 +63,12 @@ app.get("/image", nocache, async (request, response) => {
 
   context.fillStyle = "#fff";
   context.font = "bold 30pt Menlo";
-  context.fillText("diwakersurya", 600, 540);
+  context.fillText(user, 600, 540);
 
   context.beginPath();
 
   /* loading image from github url*/
-  const myimg = await loadImage(
-    "https://avatars3.githubusercontent.com/u/7386665?s=400&u=aaff658cd860d5f886775a293c58e73fa57e7bf9&v=4"
-  );
+  const myimg = await loadImage(avatarUrl);
   context.arc(600, 500, 50, 0, 2 * Math.PI);
   context.clip();
   context.drawImage(myimg, 530, 450, myimg.width * 0.3, myimg.height * 0.3);
