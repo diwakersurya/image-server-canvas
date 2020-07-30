@@ -172,14 +172,32 @@ app.get("/github", nocache, async (request, response) => {
   colorStops: getGradientStops(2)
 });
   canvas.add(rect);
+  
+  
+  /*ribbon*/
+    const ribbon=new fabric.Rect({
+    width:400,
+    height:30,
+    fill:"yellow"
+  })
+  ribbon.setGradient('fill', {
+  x1: 0,
+  y1: 0,
+  x2: rect.width,
+  y2: 0,
+    
+  colorStops: getGradientStops(2)
+});
+  
 var text = new fabric.Text('Hello world \nFrom Fabric JS', {
             width:250,
-            cursorColor :"blue",
-            top:10,
-            left:10
+            fill: 'rgb(255,255,255)',
+  stroke:"#ffffff"
         });
   
   canvas.add(text)
+  text.set({            top:h/2-text.width,
+            left:w/2-text.width,})
 var dataURL = canvas.toDataURL({
   format: 'png',
   quality: 1,
