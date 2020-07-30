@@ -140,6 +140,20 @@ var text = new fabric.Text('Hello world \nFrom Fabric JS', {
             top:10,
             left:10
         });
+    text.setGradient('fill', {
+  x1: 0,
+  y1: 0,
+  x2: text.width,
+  y2: 0,
+  colorStops: {
+    0: "red",
+    0.2: "orange",
+    0.4: "yellow",
+    0.6: "green",
+    0.8: "blue",
+    1: "purple"
+  }
+});
   canvas.add(text)
 var dataURL = canvas.toDataURL({
   format: 'png',
