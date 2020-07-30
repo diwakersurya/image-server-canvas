@@ -160,8 +160,8 @@ app.get("/github", nocache, async (request, response) => {
     width:w-20,
     height:h-20,
     strokeWidth: 20, stroke: 'rgb(255,255,255)',
-        rx:10,
-    ry:10,
+   //     rx:10,
+   // ry:10,
   })
   rect.setGradient('fill', {
   x1: 0,
@@ -175,19 +175,23 @@ app.get("/github", nocache, async (request, response) => {
   
   
   /*ribbon*/
-    const ribbon=new fabric.Rect({
+  const ribbon=new fabric.Rect({
     width:400,
-    height:30,
-    fill:"yellow"
+    height:50,
+    fill:"yellow",
+    angle:-45,
+    left:-50,
+    top:200
   })
   ribbon.setGradient('fill', {
   x1: 0,
   y1: 0,
-  x2: rect.width,
+  x2: ribbon.width,
   y2: 0,
     
   colorStops: getGradientStops(2)
 });
+  canvas.add(ribbon);
   
 var text = new fabric.Text('Hello world \nFrom Fabric JS', {
             width:250,
@@ -196,8 +200,8 @@ var text = new fabric.Text('Hello world \nFrom Fabric JS', {
         });
   
   canvas.add(text)
-  text.set({            top:h/2-text.width,
-            left:w/2-text.width,})
+  text.set({            top:h/2-text.height/2,
+            left:w/2-text.width/2})
 var dataURL = canvas.toDataURL({
   format: 'png',
   quality: 1,
