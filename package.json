@@ -12,6 +12,7 @@
   "dependencies": {
     "@octokit/rest": "^18.0.3",
     "canvas": "^2.6.1",
+    "data-uri-to-buffer": "^3.0.1",
     "express": "^4.17.1",
     "fabric": "^3.6.3"
   },

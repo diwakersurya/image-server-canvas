@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const { createCanvas, loadImage } = require("canvas");
 const fabric=require("fabric").fabric;
-console.log(fabric)
+var dataUriToBuffer = require('data-uri-to-buffer');
 const messages = require("./messages");
 const { Octokit } = require("@octokit/rest");
 const octokit = new Octokit();
@@ -128,11 +128,12 @@ app.get("/github", nocache, async (request, response) => {
     created_at: '2014-04-23T16:40:38Z',
     updated_at: '2020-07-28T12:47:10Z'
   }
-  const c = createCanvas(w, h);
-  const context = c.getContext("2d");
-    context.fillStyle = bg;
+ // const c = createCanvas(w, h);
+ // const context = c.getContext("2d");
+ //   context.fillStyle = bg;
   
-  var canvas = new fabric.Canvas("c");
+  var canvas = new fabric.Canvas();
+  canvas.backgroundColor=getRandomColor();
 var text = new fabric.Textbox('Hello world From Fabric JS', {
             width:250,
             cursorColor :"blue",
@@ -140,10 +141,13 @@ var text = new fabric.Textbox('Hello world From Fabric JS', {
             left:10
         });
   canvas.add(text)
-  context.fillRect(0, 0, w, h);
+var dataURL = canvas.toDataURL({
+  format: 'png',
+  quality: 0.8
+});
 
   /*sending as response to client*/
-  const buffer = canvas.toBuffer("image/png");
+  const buffer = dataUriToBuffer(dataURL);
   response.contentType("image/jpeg");
   response.send(buffer);
 });
