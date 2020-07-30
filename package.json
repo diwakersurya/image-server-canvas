@@ -10,8 +10,9 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "canvas": "^2.6.1"
+    "@octokit/rest": "^18.0.3",
+    "canvas": "^2.6.1",
+    "express": "^4.17.1"
   },
   "engines": {
     "node": "12.x"

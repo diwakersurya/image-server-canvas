@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const { createCanvas, loadImage } = require("canvas");
 const messages = require("./messages");
+const { Octokit } = require("@octokit/rest");
+const octokit = new Octokit();
 //https://stackoverflow.com/questions/1484506/random-color-generator
 function getRandomColor() {
   var letters = "0123456789ABCDEF";
