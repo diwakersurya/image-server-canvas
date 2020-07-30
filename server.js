@@ -21,6 +21,21 @@ function getRandomInt(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
+function getGradientStops(stops) {
+  // {
+  //   0: "red",
+  //   0.2: "orange",
+  //   0.4: "yellow",
+  //   0.6: "green",
+  //   0.8: "blue",
+  //   1: "purple"
+  // }
+  const gStop={};
+  const stopInc=1/Stops
+  for(let i=0;i<stops;i++){
+    
+  }
+}
 
 function nocache(req, res, next) {
   res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
@@ -133,7 +148,27 @@ app.get("/github", nocache, async (request, response) => {
  //   context.fillStyle = bg;
   
   var canvas = new fabric.Canvas();
+  canvas.setDimensions({width:w, height:h});
   canvas.backgroundColor=getRandomColor();
+  const rect=new fabric.Rect({
+    width:w,
+    height:w
+  })
+  rect.setGradient('fill', {
+  x1: 0,
+  y1: 0,
+  x2: rect.width,
+  y2: 0,
+  colorStops: {
+    0: "red",
+    0.2: "orange",
+    0.4: "yellow",
+    0.6: "green",
+    0.8: "blue",
+    1: "purple"
+  }
+});
+  canvas.add(rect);
 var text = new fabric.Text('Hello world \nFrom Fabric JS', {
             width:250,
             cursorColor :"blue",
@@ -145,14 +180,7 @@ var text = new fabric.Text('Hello world \nFrom Fabric JS', {
   y1: 0,
   x2: text.width,
   y2: 0,
-  colorStops: {
-    0: "red",
-    0.2: "orange",
-    0.4: "yellow",
-    0.6: "green",
-    0.8: "blue",
-    1: "purple"
-  }
+  colorStops: getGradientStops(5)
 });
   canvas.add(text)
 var dataURL = canvas.toDataURL({
