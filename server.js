@@ -134,7 +134,7 @@ app.get("/github", nocache, async (request, response) => {
   
   var canvas = new fabric.Canvas();
   canvas.backgroundColor=getRandomColor();
-var text = new fabric.Textbox('Hello world From Fabric JS', {
+var text = new fabric.Text('Hello world \nFrom Fabric JS', {
             width:250,
             cursorColor :"blue",
             top:10,
