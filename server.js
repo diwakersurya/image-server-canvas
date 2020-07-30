@@ -159,7 +159,8 @@ app.get("/github", nocache, async (request, response) => {
   const rect=new fabric.Rect({
     width:w,
     height:w,
-    stroke:1
+    strokeWidth: 5, 
+    stroke: "#ffffff"
   })
   rect.setGradient('fill', {
   x1: 0,
