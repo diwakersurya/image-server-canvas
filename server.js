@@ -31,10 +31,16 @@ function getGradientStops(stops) {
   //   1: "purple"
   // }
   const gStop={};
-  const stopInc=1/Stops
-  for(let i=0;i<stops;i++){
-    
+  const stopInc=(1/stops).toFixed(1);
+  let initStop=0;
+  while(initStop<1){
+    gStop[initStop]=getRandomColor();
+    initStop+=stopInc;
   }
+  if(initStop!==1){
+    gStop[1]=getRandomColor();
+  }
+  return gStop;
 }
 
 function nocache(req, res, next) {
@@ -152,21 +158,16 @@ app.get("/github", nocache, async (request, response) => {
   canvas.backgroundColor=getRandomColor();
   const rect=new fabric.Rect({
     width:w,
-    height:w
+    height:w,
+    stroke:1
   })
   rect.setGradient('fill', {
   x1: 0,
   y1: 0,
   x2: rect.width,
   y2: 0,
-  colorStops: {
-    0: "red",
-    0.2: "orange",
-    0.4: "yellow",
-    0.6: "green",
-    0.8: "blue",
-    1: "purple"
-  }
+    gradiendTransform:[1, 0, 0.5, 1, 150, 0],
+  colorStops: getGradientStops(2)
 });
   canvas.add(rect);
 var text = new fabric.Text('Hello world \nFrom Fabric JS', {
@@ -175,13 +176,7 @@ var text = new fabric.Text('Hello world \nFrom Fabric JS', {
             top:10,
             left:10
         });
-    text.setGradient('fill', {
-  x1: 0,
-  y1: 0,
-  x2: text.width,
-  y2: 0,
-  colorStops: getGradientStops(5)
-});
+  
   canvas.add(text)
 var dataURL = canvas.toDataURL({
   format: 'png',
