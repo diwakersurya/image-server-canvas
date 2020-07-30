@@ -157,17 +157,18 @@ app.get("/github", nocache, async (request, response) => {
   canvas.setDimensions({width:w, height:h});
   canvas.backgroundColor=getRandomColor();
   const rect=new fabric.Rect({
-    width:w,
-    height:w,
-    strokeWidth: 5, 
-    stroke: "#ffffff"
+    width:w-20,
+    height:h-20,
+    strokeWidth: 20, stroke: 'rgb(255,255,255)',
+        rx:10,
+    ry:10,
   })
   rect.setGradient('fill', {
   x1: 0,
   y1: 0,
   x2: rect.width,
   y2: 0,
-    gradiendTransform:[1, 0, 0.5, 1, 150, 0],
+    
   colorStops: getGradientStops(2)
 });
   canvas.add(rect);
