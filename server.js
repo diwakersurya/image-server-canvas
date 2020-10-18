@@ -4,6 +4,7 @@ const { createCanvas, loadImage } = require("canvas");
 const fabric=require("fabric").fabric;
 var dataUriToBuffer = require('data-uri-to-buffer');
 const messages = require("./messages");
+const axios =require("axios")
 const { Octokit } = require("@octokit/rest");
 const octokit = new Octokit();
 //https://stackoverflow.com/questions/1484506/random-color-generator
@@ -215,7 +216,13 @@ var dataURL = canvas.toDataURL({
 });
 
 app.get("/pipe", async (request, response) => {
-  
+  const url="https://unsplash.com/photos/syT5FIH4Njc/download?force=true&w=640";
+  const res = await axios({
+    method: 'GET',
+    url: url,
+    responseType: 'stream'
+  })
+  res.data.pipe(response);
 });
 // listen for requests :)
 const listener = app.listen(process.env.PORT, () => {
