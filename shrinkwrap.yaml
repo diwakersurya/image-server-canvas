@@ -1,5 +1,6 @@
 dependencies:
   '@octokit/rest': 18.0.3
+  axios: 0.20.0
   canvas: 2.6.1
   data-uri-to-buffer: 3.0.1
   express: 4.17.1
@@ -215,6 +216,12 @@ packages:
     optional: true
     resolution:
       integrity: sha512-3YDiu347mtVtjpyV3u5kVqQLP242c06zwDOgpeRnybmXlYYsLbtTrUBUm8i8srONt+FWobl5aibnU1030PeeuA==
+  /axios/0.20.0:
+    dependencies:
+      follow-redirects: 1.13.0
+    dev: false
+    resolution:
+      integrity: sha512-ANA4rr2BDcmmAQLOKft2fufrtuvlqR+cXNNinUmvfeSNCOF98PZL+7M/v1zIdGo7OLjEA9J2gXJL+j4zGsl0bA==
   /balanced-match/1.0.0:
     dev: false
     resolution:
@@ -608,6 +615,12 @@ packages:
       node: '>= 0.8'
     resolution:
       integrity: sha512-aAWcW57uxVNrQZqFXjITpW3sIUQmHGG3qSb9mUah9MgMC4NeWhNOlNjXEYq3HjRAvL6arUviZGGJsBg6z0zsWA==
+  /follow-redirects/1.13.0:
+    dev: false
+    engines:
+      node: '>=4.0'
+    resolution:
+      integrity: sha512-aq6gF1BEKje4a9i9+5jimNFIpq4Q1WiwBToeRK5NvZBd/TRsmW8BsJfOEGkr76TbOyPVD3OVDN910EcUNtRYEA==
   /forever-agent/0.6.1:
     dev: false
     optional: true
@@ -1731,6 +1744,7 @@ shrinkwrapMinorVersion: 9
 shrinkwrapVersion: 3
 specifiers:
   '@octokit/rest': ^18.0.3
+  axios: ^0.20.0
   canvas: ^2.6.1
   data-uri-to-buffer: ^3.0.1
   express: ^4.17.1
