@@ -233,19 +233,12 @@ var text = new fabric.Text(`${salutationText}`, {
   canvas.add(languageText)
   languageText.set({top:h/2-languageText.height/2+70,
             left:w/2-languageText.width/2})
-  var line = new fabric.Line({
-            width:250,
-            fill: 'rgb(255,255,255)',
-            stroke:"#ffffff",
-            shadow: 'rgba(0,0,0,0.3) 5px 5px 5px'
-        });
-  
-  canvas.add(line)
+
   
   /*user text*/
   var userText = new fabric.Text(`${userInfo.login}`, {
   //           width:250,
-            fill: 'rgba(255, 255, 255, 0.5)',
+            fill: '#03A87C',
   // stroke:"#ffffff",
      //shadow: 'rgba(0,0,0,0.6) 5px 5px 5px',
        fontSize: 30,
@@ -257,6 +250,15 @@ var text = new fabric.Text(`${salutationText}`, {
   canvas.add(userText)
   userText.set({top:50,
             left:w-userText.width-80})
+  
+  
+   var line = new fabric.Line( [ 50, 70-(userText.height/2), w-(80+userText.width10), 70-(userText.height/2)], {
+  strokeWidth: 1,
+  stroke: '#03A87C'
+} );
+  
+  canvas.add(line)
+  
   
 var dataURL = canvas.toDataURL({
   format: 'png',
