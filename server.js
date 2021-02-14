@@ -158,10 +158,13 @@ app.get("/github", nocache, async (request, response) => {
   canvas.setDimensions({width:w, height:h});
  // canvas.backgroundColor=getRandomColor();
   const rect=new fabric.Rect({
-    width:w-20,
-    height:h-20,
-    strokeWidth: 50, stroke: 'rgb(255,255,255)',
-     strokeLineJoin: 'round',
+    width:w,
+    height:h,
+    top:200,
+     rx: 20, 
+  ry: 20,
+    //strokeWidth: 1, stroke: 'rgb(255,255,255)',
+     //strokeLineJoin: 'round',
   })
   rect.setGradient('fill', {
   x1: 0,
@@ -210,7 +213,8 @@ app.get("/github", nocache, async (request, response) => {
 var text = new fabric.Text(`${salutationText}`, {
             width:250,
             fill: 'rgb(255,255,255)',
-  stroke:"#ffffff"
+  stroke:"#ffffff",
+      fontSize: 50,
         });
   
   canvas.add(text)
@@ -222,7 +226,8 @@ var text = new fabric.Text(`${salutationText}`, {
             width:250,
             fill: 'rgb(255,255,255)',
             stroke:"#ffffff",
-            fontSize: 20
+            fontSize: 20,
+            shadow: 'rgba(0,0,0,0.3) 5px 5px 5px'
         });
   
   canvas.add(languageText)
