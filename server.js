@@ -237,12 +237,14 @@ var text = new fabric.Text(`${salutationText}`, {
   
   /*user text*/
   var userText = new fabric.Text(`${userInfo.login}`, {
-            width:250,
-            fill: 'rgb(211, 211, 211)',
-  stroke:"#ffffff",
-    shadow: 'rgba(0,0,0,0.6) 5px 5px 5px',
-      fontSize: 30,
-     fontStyle: 'italic'
+  //           width:250,
+            fill: 'rgba(255, 255, 255, 0.5)',
+  // stroke:"#ffffff",
+     //shadow: 'rgba(0,0,0,0.6) 5px 5px 5px',
+       fontSize: 30,
+      fontStyle: 'italic',
+    // stroke: 'rgba(255, 255, 255, 0.5)',
+  strokeWidth: 1
         });
   
   canvas.add(userText)
