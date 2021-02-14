@@ -248,11 +248,11 @@ var text = new fabric.Text(`${salutationText}`, {
         });
   
   canvas.add(userText)
-  userText.set({top:50,
+  userText.set({top:50-userText.height/2,
             left:w-userText.width-80})
   
   
-   var line = new fabric.Line( [ 50, 70-(userText.height/2), w-(80+userText.width10), 70-(userText.height/2)], {
+   var line = new fabric.Line( [ 50, 70-(userText.height/2), w-80-userText.width, 70-(userText.height/2)], {
   strokeWidth: 1,
   stroke: '#03A87C'
 } );
