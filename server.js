@@ -112,44 +112,45 @@ app.get("/github", nocache, async (request, response) => {
     w=1200/*image width*/,
     h=630/*image height*/
   }=request.query;
-//   const userInfo=await octokit.request('GET /users/{username}', {
-//   username: user
-// })
-  const userInfo={
-    login: 'diwakersurya',
-    id: 7386665,
-    node_id: 'MDQ6VXNlcjczODY2NjU=',
-    avatar_url: 'https://avatars3.githubusercontent.com/u/7386665?v=4',
-    gravatar_id: '',
-    url: 'https://api.github.com/users/diwakersurya',
-    html_url: 'https://github.com/diwakersurya',
-    followers_url: 'https://api.github.com/users/diwakersurya/followers',
-    following_url: 'https://api.github.com/users/diwakersurya/following{/other_user}',
-    gists_url: 'https://api.github.com/users/diwakersurya/gists{/gist_id}',
-    starred_url: 'https://api.github.com/users/diwakersurya/starred{/owner}{/repo}',
-    subscriptions_url: 'https://api.github.com/users/diwakersurya/subscriptions',
-    organizations_url: 'https://api.github.com/users/diwakersurya/orgs',
-    repos_url: 'https://api.github.com/users/diwakersurya/repos',
-    events_url: 'https://api.github.com/users/diwakersurya/events{/privacy}',
-    received_events_url: 'https://api.github.com/users/diwakersurya/received_events',
-    type: 'User',
-    site_admin: false,
-    name: 'Diwaker Singh',
-    company: '@inmobi',
-    blog: '',
-    location: 'Bangalore',
-    email: null,
-    hireable: true,
-    bio: 'Fullstack Developer with experience on ' +
-      'node, express , react and javascript.',
-    twitter_username: 'diwakersurya',
-    public_repos: 51,
-    public_gists: 12,
-    followers: 8,
-    following: 11,
-    created_at: '2014-04-23T16:40:38Z',
-    updated_at: '2020-07-28T12:47:10Z'
-  }
+  const {data:userInfo}=await octokit.request(`GET /users/${user}`, {
+  username: user
+})
+  console.log(userInfo)
+  // const userInfo={
+  //   login: 'diwakersurya',
+  //   id: 7386665,
+  //   node_id: 'MDQ6VXNlcjczODY2NjU=',
+  //   avatar_url: 'https://avatars3.githubusercontent.com/u/7386665?v=4',
+  //   gravatar_id: '',
+  //   url: 'https://api.github.com/users/diwakersurya',
+  //   html_url: 'https://github.com/diwakersurya',
+  //   followers_url: 'https://api.github.com/users/diwakersurya/followers',
+  //   following_url: 'https://api.github.com/users/diwakersurya/following{/other_user}',
+  //   gists_url: 'https://api.github.com/users/diwakersurya/gists{/gist_id}',
+  //   starred_url: 'https://api.github.com/users/diwakersurya/starred{/owner}{/repo}',
+  //   subscriptions_url: 'https://api.github.com/users/diwakersurya/subscriptions',
+  //   organizations_url: 'https://api.github.com/users/diwakersurya/orgs',
+  //   repos_url: 'https://api.github.com/users/diwakersurya/repos',
+  //   events_url: 'https://api.github.com/users/diwakersurya/events{/privacy}',
+  //   received_events_url: 'https://api.github.com/users/diwakersurya/received_events',
+  //   type: 'User',
+  //   site_admin: false,
+  //   name: 'Diwaker Singh',
+  //   company: '@inmobi',
+  //   blog: '',
+  //   location: 'Bangalore',
+  //   email: null,
+  //   hireable: true,
+  //   bio: 'Fullstack Developer with experience on ' +
+  //     'node, express , react and javascript.',
+  //   twitter_username: 'diwakersurya',
+  //   public_repos: 51,
+  //   public_gists: 12,
+  //   followers: 8,
+  //   following: 11,
+  //   created_at: '2014-04-23T16:40:38Z',
+  //   updated_at: '2020-07-28T12:47:10Z'
+  // }
  // const c = createCanvas(w, h);
   //const context = c.getContext("2d");
  //   context.fillStyle = bg;
@@ -272,15 +273,15 @@ var dataURL = canvas.toDataURL({
   response.send(buffer);
 });
 
-app.get("/pipe", async (request, response) => {
-  const url="https://unsplash.com/photos/syT5FIH4Njc/download?force=true&w=640";
-  const res = await axios({
-    method: 'GET',
-    url: url,
-    responseType: 'stream'
-  })
-  res.data.pipe(response);
-});
+// app.get("/pipe", async (request, response) => {
+//   const url="https://unsplash.com/photos/syT5FIH4Njc/download?force=true&w=640";
+//   const res = await axios({
+//     method: 'GET',
+//     url: url,
+//     responseType: 'stream'
+//   })
+//   res.data.pipe(response);
+// });
 // listen for requests :)
 const listener = app.listen(process.env.PORT, () => {
   console.log("Your app is listening on port " + listener.address().port);
