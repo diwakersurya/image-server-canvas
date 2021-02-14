@@ -159,7 +159,7 @@ app.get("/github", nocache, async (request, response) => {
  // canvas.backgroundColor=getRandomColor();
   const rect=new fabric.Rect({
     width:w,
-    height:h,
+    height:h-100,
     top:100,
      rx: 20, 
   ry: 20,
