@@ -160,7 +160,7 @@ app.get("/github", nocache, async (request, response) => {
   const rect=new fabric.Rect({
     width:w,
     height:h,
-    top:200,
+    top:100,
      rx: 20, 
   ry: 20,
     //strokeWidth: 1, stroke: 'rgb(255,255,255)',
@@ -183,7 +183,7 @@ app.get("/github", nocache, async (request, response) => {
     fill:"yellow",
     angle:-45,
     left:-50,
-    top:200
+    top:300
   })
   ribbon.setGradient('fill', {
   x1: 0,
@@ -193,7 +193,7 @@ app.get("/github", nocache, async (request, response) => {
     
   colorStops: getGradientStops(1)
 });
-  canvas.add(ribbon);
+ // canvas.add(ribbon);
     /* getting randome message if random language*/
   const randomIndex = getRandomInt(0, 50);
   const language = Object.keys(messages)[randomIndex];
@@ -234,6 +234,20 @@ var text = new fabric.Text(`${salutationText}`, {
   languageText.set({top:h/2-languageText.height/2+70,
             left:w/2-languageText.width/2})
   
+  
+  /*user text*/
+  var userText = new fabric.Text(`${userInfo.login}`, {
+            width:250,
+            fill: 'rgb(255,255,255)',
+  stroke:"#ffffff",
+    shadow: 'rgba(0,0,0,0.3) 5px 5px 5px',
+      fontSize: 30,
+     fontStyle: 'italic'
+        });
+  
+  canvas.add(userText)
+  userText.set({top:100-userText.height/2,
+            left:w-userText.width-80})
   
 var dataURL = canvas.toDataURL({
   format: 'png',
