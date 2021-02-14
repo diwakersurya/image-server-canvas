@@ -151,7 +151,7 @@ app.get("/github", nocache, async (request, response) => {
     updated_at: '2020-07-28T12:47:10Z'
   }
  // const c = createCanvas(w, h);
- // const context = c.getContext("2d");
+  //const context = c.getContext("2d");
  //   context.fillStyle = bg;
   
   var canvas = new fabric.Canvas();
@@ -191,17 +191,43 @@ app.get("/github", nocache, async (request, response) => {
   colorStops: getGradientStops(1)
 });
   canvas.add(ribbon);
+    /* getting randome message if random language*/
+  const randomIndex = getRandomInt(0, 50);
+  const language = Object.keys(messages)[randomIndex];
   
-var text = new fabric.Text('Hello world \nFrom Fabric JS', {
+   const salutationText = messages[language];
+ // const textWidth = context.measureText(text).width;
+  /*drawing text on canvas*/
+  //context.fillStyle = "#fff";
+ // context.fillText(text, 600, 170);
+  //context.font = "bold 15pt Menlo";
+ // context.fillText(`(${language})`, 600, 280);
+
+  //context.fillStyle = "#fff";
+  //context.font = "bold 30pt Menlo";
+  //context.fillText(user, 600, 540);
+  
+var text = new fabric.Text(`${salutationText}`, {
             width:250,
             fill: 'rgb(255,255,255)',
   stroke:"#ffffff"
         });
   
   canvas.add(text)
-  text.set({            top:h/2-text.height/2,
+  text.set({top:h/2-text.height/2,
             left:w/2-text.width/2})
   
+  
+  var languageText = new fabric.Text(`--(${language})--`, {
+            width:250,
+            fill: 'rgb(255,255,255)',
+            stroke:"#ffffff",
+            fontSize: 20
+        });
+  
+  canvas.add(languageText)
+  languageText.set({top:h/2-languageText.height/2+70,
+            left:w/2-languageText.width/2})
   
   
 var dataURL = canvas.toDataURL({
