@@ -156,25 +156,23 @@ app.get("/github", nocache, async (request, response) => {
   
   var canvas = new fabric.Canvas();
   canvas.setDimensions({width:w, height:h});
-  canvas.backgroundColor=getRandomColor();
+ // canvas.backgroundColor=getRandomColor();
   const rect=new fabric.Rect({
     width:w-20,
     height:h-20,
-    strokeWidth: 20, stroke: 'rgb(255,255,255)',
-   //     rx:10,
-   // ry:10,
+    strokeWidth: 50, stroke: 'rgb(255,255,255)',
+     strokeLineJoin: 'round',
   })
   rect.setGradient('fill', {
   x1: 0,
   y1: 0,
   x2: rect.width,
   y2: 0,
-    strokeLineJoin: 'round',
   colorStops: getGradientStops(1)
 });
   canvas.add(rect);
   
-  
+
   /*ribbon*/
   const ribbon=new fabric.Rect({
     width:400,
@@ -203,6 +201,9 @@ var text = new fabric.Text('Hello world \nFrom Fabric JS', {
   canvas.add(text)
   text.set({            top:h/2-text.height/2,
             left:w/2-text.width/2})
+  
+  
+  
 var dataURL = canvas.toDataURL({
   format: 'png',
   quality: 1,
