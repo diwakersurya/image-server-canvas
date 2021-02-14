@@ -169,8 +169,8 @@ app.get("/github", nocache, async (request, response) => {
   y1: 0,
   x2: rect.width,
   y2: 0,
-    
-  colorStops: getGradientStops(2)
+    strokeLineJoin: 'round',
+  colorStops: getGradientStops(1)
 });
   canvas.add(rect);
   
@@ -190,7 +190,7 @@ app.get("/github", nocache, async (request, response) => {
   x2: ribbon.width,
   y2: 0,
     
-  colorStops: getGradientStops(2)
+  colorStops: getGradientStops(1)
 });
   canvas.add(ribbon);
   
