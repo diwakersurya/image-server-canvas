@@ -233,7 +233,14 @@ var text = new fabric.Text(`${salutationText}`, {
   canvas.add(languageText)
   languageText.set({top:h/2-languageText.height/2+70,
             left:w/2-languageText.width/2})
+  var line = new fabric.Line({
+            width:250,
+            fill: 'rgb(255,255,255)',
+            stroke:"#ffffff",
+            shadow: 'rgba(0,0,0,0.3) 5px 5px 5px'
+        });
   
+  canvas.add(line)
   
   /*user text*/
   var userText = new fabric.Text(`${userInfo.login}`, {
@@ -248,7 +255,7 @@ var text = new fabric.Text(`${salutationText}`, {
         });
   
   canvas.add(userText)
-  userText.set({top:100-userText.height/2,
+  userText.set({top:50,
             left:w-userText.width-80})
   
 var dataURL = canvas.toDataURL({
