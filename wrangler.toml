@@ -1,0 +1,20 @@
+name = "greeting-image-generator"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[build]
+command = "npm run build"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Enable experimental features for canvas support
+compatibility_flags = ["nodejs_compat"]
+
+# Production settings
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+# Development settings  
+[env.development]
+vars = { ENVIRONMENT = "development", DEBUG = "true" }

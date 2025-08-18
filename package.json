@@ -1,32 +1,35 @@
 {
-  "//1": "describes your app and its dependencies",
-  "//2": "https://docs.npmjs.com/files/package.json",
-  "//3": "updating this file will download and update your packages",
-  "name": "hello-express",
+  "name": "greeting-image-generator",
   "version": "0.0.1",
-  "description": "A simple Node app built on Express, instantly up and running.",
-  "main": "server.js",
+  "description": "A greeting image generator running on Cloudflare Workers",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "node server.js"
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --target=es2022",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev"
   },
   "dependencies": {
-    "@octokit/rest": "^18.0.3",
-    "axios": "^0.20.0",
-    "canvas": "^2.6.1",
-    "data-uri-to-buffer": "^3.0.1",
-    "express": "^4.17.1",
-    "fabric": "^3.6.3"
+    "@octokit/rest": "^20.0.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240208.0",
+    "@types/node": "^20.11.0",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.0",
+    "wrangler": "^3.28.0"
   },
   "engines": {
-    "node": "12.x"
+    "node": ">=18.0.0"
   },
   "repository": {
-    "url": "https://glitch.com/edit/#!/hello-express"
+    "url": "https://github.com/your-username/greeting-image-generator"
   },
   "license": "MIT",
   "keywords": [
-    "node",
-    "glitch",
-    "express"
+    "cloudflare-workers",
+    "image-generation",
+    "github-api",
+    "greeting-cards"
   ]
 }
