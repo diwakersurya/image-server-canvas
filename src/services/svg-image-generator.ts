@@ -173,7 +173,7 @@ export class SVGImageGenerator {
     fontWeight?: string;
     fill?: string;
     animation?: {
-      type: 'fadeIn' | 'slideIn' | 'scaleIn' | 'bounce';
+      type: 'fadeIn' | 'slideIn' | 'scaleIn' | 'bounce' | 'typewriter';
       duration: number;
       delay?: number;
       repeatCount?: 'indefinite' | number;
@@ -216,6 +216,34 @@ export class SVGImageGenerator {
             <animateTransform attributeName="transform" type="translate" values="0,0;0,-10;0,0" dur="${duration}s" begin="${delay}s" repeatCount="${repeatCount}"/>
           `;
           break;
+        case 'typewriter':
+          // Create typewriter effect by animating text content
+          const textLength = text.length;
+          const charDuration = duration / textLength;
+
+          // Create individual tspan elements for each character
+          let typewriterContent = '';
+          for (let i = 0; i < textLength; i++) {
+            const char = text[i];
+            const beginTime = delay + (i * charDuration);
+            typewriterContent += `<tspan opacity="0">${this.escapeXml(char)}
+              <animate attributeName="opacity" values="0;1" dur="${charDuration * 0.5}s" begin="${beginTime}s" fill="freeze"/>
+            </tspan>`;
+          }
+
+          // Replace the text content with animated tspans
+          this.elements.push(`
+            <text x="${x}" y="${y}"
+                  font-family="${fontFamily}"
+                  font-size="${fontSize}"
+                  font-weight="${fontWeight}"
+                  fill="${fill}"
+                  text-anchor="middle"
+                  dominant-baseline="middle">
+              ${typewriterContent}
+            </text>
+          `);
+          return; // Exit early since we've already added the element
       }
     }
 

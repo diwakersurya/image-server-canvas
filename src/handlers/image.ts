@@ -115,8 +115,8 @@ async function generateSimpleImage(params: SimpleImageParams): Promise<{ content
       fontWeight: 'bold',
       fill: '#ffffff',
       animation: {
-        type: 'scaleIn',
-        duration: 1.5,
+        type: 'typewriter',
+        duration: 2,
         delay: 1.5,
         repeatCount: 1
       }
