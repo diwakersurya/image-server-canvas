@@ -94,7 +94,17 @@ export function optimizeImageDimensions(width: number, height: number, maxPixels
 /**
  * Create optimized cache headers based on content type
  */
-export function createOptimizedCacheHeaders(contentType: string, isStatic: boolean = false): Record<string, string> {
+export function createOptimizedCacheHeaders(contentType: string, isStatic: boolean = false, noCache: boolean = false): Record<string, string> {
+  // Explicitly disable all caching when requested
+  if (noCache) {
+    return {
+      'Cache-Control': 'private, no-cache, no-store, must-revalidate',
+      'Expires': '-1',
+      'Pragma': 'no-cache',
+      'Vary': 'Accept'
+    };
+  }
+
   if (isStatic) {
     // Long cache for static assets
     return {
@@ -104,16 +114,16 @@ export function createOptimizedCacheHeaders(contentType: string, isStatic: boole
       'Vary': 'Accept-Encoding'
     };
   }
-  
+
   if (contentType.startsWith('image/')) {
-    // Short cache for dynamic images
+    // Short cache for dynamic images (5 minutes)
     return {
       'Cache-Control': 'public, max-age=300, s-maxage=300', // 5 minutes
       'Expires': new Date(Date.now() + 300 * 1000).toUTCString(),
       'Vary': 'Accept'
     };
   }
-  
+
   // No cache for API responses
   return {
     'Cache-Control': 'private, no-cache, no-store, must-revalidate',
@@ -228,15 +238,16 @@ export function createOptimizedResponse(
   body: BodyInit,
   contentType: string,
   isStatic: boolean = false,
-  additionalHeaders: Record<string, string> = {}
+  additionalHeaders: Record<string, string> = {},
+  noCache: boolean = false
 ): Response {
-  const cacheHeaders = createOptimizedCacheHeaders(contentType, isStatic);
-  
+  const cacheHeaders = createOptimizedCacheHeaders(contentType, isStatic, noCache);
+
   const headers = {
     'Content-Type': contentType,
     ...cacheHeaders,
     ...additionalHeaders
   };
-  
+
   return new Response(body, { headers });
 }

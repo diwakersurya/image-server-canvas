@@ -12,6 +12,22 @@ export interface SVGImageOptions {
   language: string;
 }
 
+export interface AnimatedGradientOptions {
+  colors: string[];
+  direction: 'horizontal' | 'vertical' | 'diagonal';
+  duration: number; // in seconds
+  repeatCount: 'indefinite' | number;
+  easing?: 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out';
+  animateType?: 'color' | 'position' | 'opacity';
+}
+
+export interface AnimationOptions {
+  duration: number;
+  repeatCount: 'indefinite' | number;
+  begin?: number; // delay in seconds
+  easing?: 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out';
+}
+
 export class SVGImageGenerator {
   private width: number;
   private height: number;
@@ -41,7 +57,7 @@ export class SVGImageGenerator {
     const x2 = direction === 'horizontal' ? '100%' : '0%';
     const y2 = direction === 'horizontal' ? '0%' : '100%';
 
-    const stops = colors.map((color, index) => 
+    const stops = colors.map((color, index) =>
       `<stop offset="${(index / (colors.length - 1)) * 100}%" stop-color="${color}"/>`
     ).join('');
 
@@ -55,6 +71,186 @@ export class SVGImageGenerator {
 
     this.elements.push(`
       <rect width="100%" height="100%" fill="url(#${gradientId})"/>
+    `);
+  }
+
+  /**
+   * Set animated gradient background with SMIL animations
+   */
+  setAnimatedGradientBackground(options: AnimatedGradientOptions): void {
+    const {
+      colors,
+      direction,
+      duration,
+      repeatCount,
+      easing = 'linear',
+      animateType = 'color'
+    } = options;
+
+    const gradientId = `animated-bg-gradient-${Date.now()}`;
+    const x1 = direction === 'horizontal' ? '0%' : direction === 'diagonal' ? '0%' : '0%';
+    const y1 = direction === 'vertical' ? '0%' : direction === 'diagonal' ? '0%' : '0%';
+    const x2 = direction === 'horizontal' ? '100%' : direction === 'diagonal' ? '100%' : '0%';
+    const y2 = direction === 'vertical' ? '100%' : direction === 'diagonal' ? '100%' : '0%';
+
+    let gradientContent = '';
+    let animationContent = '';
+
+    if (animateType === 'color') {
+      // Create multiple color stops with animation
+      colors.forEach((color, index) => {
+        const stopId = `stop-${index}`;
+        const nextColor = colors[(index + 1) % colors.length];
+
+        gradientContent += `<stop id="${stopId}" offset="${(index / (colors.length - 1)) * 100}%" stop-color="${color}"/>`;
+        animationContent += `
+          <animate
+            xlink:href="#${stopId}"
+            attributeName="stop-color"
+            values="${color};${nextColor};${color}"
+            dur="${duration}s"
+            repeatCount="${repeatCount}"
+            calcMode="paced"
+            begin="${index * (duration / colors.length)}s"
+          />`;
+      });
+    } else if (animateType === 'position') {
+      // Animate gradient position
+      gradientContent = colors.map((color, index) =>
+        `<stop offset="${(index / (colors.length - 1)) * 100}%" stop-color="${color}"/>`
+      ).join('');
+
+      // Animate the gradient transform
+      animationContent = `
+        <animateTransform
+          attributeName="gradientTransform"
+          type="translate"
+          values="0,0;-100,0;100,0;0,0"
+          dur="${duration}s"
+          repeatCount="${repeatCount}"
+          calcMode="spline"
+          keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"
+        />`;
+    } else if (animateType === 'opacity') {
+      // Animate opacity of gradient stops
+      colors.forEach((color, index) => {
+        const stopId = `stop-${index}`;
+        gradientContent += `<stop id="${stopId}" offset="${(index / (colors.length - 1)) * 100}%" stop-color="${color}" stop-opacity="1"/>`;
+
+        animationContent += `
+          <animate
+            xlink:href="#${stopId}"
+            attributeName="stop-opacity"
+            values="1;0.3;1"
+            dur="${duration}s"
+            repeatCount="${repeatCount}"
+            calcMode="paced"
+            begin="${index * (duration / colors.length)}s"
+          />`;
+      });
+    }
+
+    this.elements.unshift(`
+      <defs>
+        <linearGradient id="${gradientId}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
+          ${gradientContent}
+          ${animationContent}
+        </linearGradient>
+      </defs>
+    `);
+
+    this.elements.push(`
+      <rect width="100%" height="100%" fill="url(#${gradientId})"/>
+    `);
+  }
+
+  /**
+   * Add animated text with various effects
+   */
+  drawAnimatedText(text: string, x: number, y: number, options: {
+    fontSize: number;
+    fontFamily?: string;
+    fontWeight?: string;
+    fill?: string;
+    animation?: {
+      type: 'fadeIn' | 'slideIn' | 'scaleIn' | 'bounce';
+      duration: number;
+      delay?: number;
+      repeatCount?: 'indefinite' | number;
+    };
+  }): void {
+    const {
+      fontSize,
+      fontFamily = 'Arial, sans-serif',
+      fontWeight = 'normal',
+      fill = '#000000',
+      animation
+    } = options;
+
+    let animationAttrs = '';
+    let transformAttrs = '';
+
+    if (animation) {
+      const { type, duration, delay = 0, repeatCount = 1 } = animation;
+
+      switch (type) {
+        case 'fadeIn':
+          animationAttrs = `
+            <animate attributeName="opacity" values="0;1" dur="${duration}s" begin="${delay}s" repeatCount="${repeatCount}" fill="freeze"/>
+          `;
+          break;
+        case 'slideIn':
+          transformAttrs = `transform="translate(-50, 0)"`;
+          animationAttrs = `
+            <animateTransform attributeName="transform" type="translate" values="-50,0;0,0" dur="${duration}s" begin="${delay}s" repeatCount="${repeatCount}" fill="freeze"/>
+          `;
+          break;
+        case 'scaleIn':
+          transformAttrs = `transform="scale(0)"`;
+          animationAttrs = `
+            <animateTransform attributeName="transform" type="scale" values="0;1.2;1" dur="${duration}s" begin="${delay}s" repeatCount="${repeatCount}" fill="freeze"/>
+          `;
+          break;
+        case 'bounce':
+          animationAttrs = `
+            <animateTransform attributeName="transform" type="translate" values="0,0;0,-10;0,0" dur="${duration}s" begin="${delay}s" repeatCount="${repeatCount}"/>
+          `;
+          break;
+      }
+    }
+
+    this.elements.push(`
+      <text x="${x}" y="${y}"
+            font-family="${fontFamily}"
+            font-size="${fontSize}"
+            font-weight="${fontWeight}"
+            fill="${fill}"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            ${transformAttrs}>
+        ${this.escapeXml(text)}
+        ${animationAttrs}
+      </text>
+    `);
+  }
+
+  /**
+   * Add custom SMIL animation to any element
+   */
+  addCustomAnimation(elementId: string, attributeName: string, values: string, options: AnimationOptions): void {
+    const { duration, repeatCount, begin = 0, easing = 'linear' } = options;
+
+    this.elements.push(`
+      <animate
+        xlink:href="#${elementId}"
+        attributeName="${attributeName}"
+        values="${values}"
+        dur="${duration}s"
+        begin="${begin}s"
+        repeatCount="${repeatCount}"
+        calcMode="${easing === 'linear' ? 'linear' : 'paced'}"
+        fill="freeze"
+      />
     `);
   }
 
@@ -166,9 +362,10 @@ export class SVGImageGenerator {
    */
   generateSVG(): string {
     return `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${this.width}" height="${this.height}" 
-     viewBox="0 0 ${this.width} ${this.height}" 
-     xmlns="http://www.w3.org/2000/svg">
+<svg width="${this.width}" height="${this.height}"
+     viewBox="0 0 ${this.width} ${this.height}"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
   ${this.elements.join('\n')}
 </svg>`;
   }

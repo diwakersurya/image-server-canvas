@@ -1,15 +1,17 @@
 /**
- * GitHub greeting image endpoint handler
+ * Simple greeting image endpoint handler
  */
 
 import { SVGImageGenerator } from '../services/svg-image-generator';
-import { githubService, GitHubUserInfo } from '../services/github';
-import { parseQueryParams, validateDimensions } from '../utils/helpers';
+import { parseQueryParams, validateDimensions, validateColor } from '../utils/helpers';
 
 export interface GitHubImageParams {
-  user: string;
   width: number;
   height: number;
+  backgroundColor?: string;
+  animated?: boolean;
+  animateType?: 'color' | 'position' | 'opacity';
+  textAnimation?: boolean;
 }
 
 /**
@@ -17,153 +19,123 @@ export interface GitHubImageParams {
  */
 function parseGitHubParams(url: URL): GitHubImageParams {
   const params = parseQueryParams(url);
-  
-  const user = params.user || 'user';
+
   const { w: width, h: height } = validateDimensions(params.w || '1200', params.h || '630');
+  const backgroundColor = params.bg || '#' + Math.floor(Math.random()*16777215).toString(16);
+  const animated = params.animated === 'true';
+  const animateType = (params.animateType as 'color' | 'position' | 'opacity') || 'color';
+  const textAnimation = params.textAnimation !== 'false';
 
   return {
-    user,
     width,
-    height
+    height,
+    backgroundColor,
+    animated,
+    animateType,
+    textAnimation
   };
 }
 
 /**
- * Generate GitHub greeting image with user profile data
+ * Generate simple greeting image with optional animations
  */
 async function generateGitHubImage(params: GitHubImageParams): Promise<{ content: string; contentType: string }> {
-  const { width, height, user } = params;
-  
-  // Fetch GitHub user info
-  let userInfo: GitHubUserInfo;
-  try {
-    userInfo = await githubService.getUserInfo(user);
-  } catch (error) {
-    console.error('Failed to fetch GitHub user info:', error);
-    // Use fallback user info
-    userInfo = {
-      login: user,
-      id: 0,
-      node_id: '',
-      avatar_url: `https://github.com/${user}.png`,
-      gravatar_id: '',
-      url: '',
-      html_url: `https://github.com/${user}`,
-      followers_url: '',
-      following_url: '',
-      gists_url: '',
-      starred_url: '',
-      subscriptions_url: '',
-      organizations_url: '',
-      repos_url: '',
-      events_url: '',
-      received_events_url: '',
-      type: 'User',
-      site_admin: false,
-      name: userInfo?.name || user,
-      company: null,
-      blog: '',
-      location: null,
-      email: null,
-      hireable: null,
-      bio: null,
-      twitter_username: null,
-      public_repos: 0,
-      public_gists: 0,
-      followers: 0,
-      following: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-  }
+  const { width, height, backgroundColor, animated, animateType, textAnimation } = params;
   
   // Create SVG image generator
   const generator = new SVGImageGenerator(width, height);
-  
-  // Add drop shadow filter
-  generator.addDropShadowFilter('textShadow', 3, 3, 6, 0.4);
-  
-  // Set gradient background
-  const colors = ['#667eea', '#764ba2'];
-  generator.setGradientBackground(colors, 'vertical');
-  
+
+  // Add drop shadow filter for text
+  generator.addDropShadowFilter('textShadow', 2, 2, 4, 0.5);
+
+  // Set background - animated or static gradient
+  if (animated) {
+    // Generate random colors for animation
+    const colors = [
+      backgroundColor,
+      '#' + Math.floor(Math.random()*16777215).toString(16),
+      '#' + Math.floor(Math.random()*16777215).toString(16),
+      adjustBrightness(backgroundColor, -20)
+    ];
+
+    generator.setAnimatedGradientBackground({
+      colors,
+      direction: 'diagonal',
+      duration: 4,
+      repeatCount: 'indefinite',
+      animateType: animateType || 'color'
+    });
+  } else {
+    // Static gradient background
+    const colors = [backgroundColor, adjustBrightness(backgroundColor, -20)];
+    generator.setGradientBackground(colors, 'vertical');
+  }
+
   // Get random greeting
   const { getRandomGreeting } = await import('../utils/messages');
   const { language, message } = getRandomGreeting();
-  
+
   // Calculate positions
   const centerX = width / 2;
   const centerY = height / 2;
-  
-  // Draw main greeting text
-  generator.drawText(message, centerX, centerY - 80, {
-    fontSize: 60,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
-    fill: '#ffffff',
-    stroke: '#000000',
-    strokeWidth: 2,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
-    filter: 'url(#textShadow)'
-  });
-  
-  // Draw language indicator
-  generator.drawText(`--(${language})--`, centerX, centerY - 20, {
-    fontSize: 20,
-    fontFamily: 'Arial, sans-serif',
-    fill: '#ffffff',
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
-    filter: 'url(#textShadow)'
-  });
-  
-  // Draw username with GitHub styling
-  generator.drawText(userInfo.login, width - 200, 80, {
-    fontSize: 30,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'normal',
-    fill: '#03A87C',
-    stroke: 'rgba(255, 255, 255, 0.5)',
-    strokeWidth: 1,
-    textAnchor: 'start',
-    dominantBaseline: 'middle'
-  });
-  
-  // Draw line under username
-  generator.drawRectangle(50, 100, width - 280, 2, {
-    fill: '#03A87C'
-  });
-  
-  // Draw user stats if available
-  if (userInfo.public_repos > 0 || userInfo.followers > 0) {
-    generator.drawText(`${userInfo.public_repos} repos • ${userInfo.followers} followers`, 50, 140, {
-      fontSize: 18,
+
+  // Draw main greeting text - animated or static
+  if (animated && textAnimation) {
+    generator.drawAnimatedText(message, centerX, centerY - 50, {
+      fontSize: 70,
       fontFamily: 'Arial, sans-serif',
+      fontWeight: 'bold',
       fill: '#ffffff',
-      textAnchor: 'start',
-      dominantBaseline: 'middle'
+      animation: {
+        type: 'fadeIn',
+        duration: 2,
+        delay: 0.5,
+        repeatCount: 1
+      }
+    });
+  } else {
+    generator.drawText(message, centerX, centerY - 50, {
+      fontSize: 70,
+      fontFamily: 'Arial, sans-serif',
+      fontWeight: 'bold',
+      fill: '#ffffff',
+      stroke: '#000000',
+      strokeWidth: 2,
+      textAnchor: 'middle',
+      dominantBaseline: 'middle',
+      filter: 'url(#textShadow)'
     });
   }
-  
-  // Draw avatar placeholder
-  const avatarSize = 80;
-  const avatarX = 50;
-  const avatarY = 50;
-  generator.drawRectangle(avatarX, avatarY, avatarSize, avatarSize, {
-    fill: '#cccccc',
-    stroke: '#ffffff',
-    strokeWidth: 3,
-    rx: 10
-  });
-  
-  // Draw user icon in avatar
-  generator.drawText('👤', avatarX + avatarSize/2, avatarY + avatarSize/2, {
-    fontSize: 40,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle'
-  });
-  
+
+  // Draw language text - animated or static
+  if (animated && textAnimation) {
+    generator.drawAnimatedText(`(${language})`, centerX, centerY + 20, {
+      fontSize: 24,
+      fontFamily: 'Arial, sans-serif',
+      fontWeight: 'bold',
+      fill: '#ffffff',
+      animation: {
+        type: 'scaleIn',
+        duration: 1.5,
+        delay: 1.5,
+        repeatCount: 1
+      }
+    });
+  } else {
+    generator.drawText(`(${language})`, centerX, centerY + 20, {
+      fontSize: 24,
+      fontFamily: 'Arial, sans-serif',
+      fontWeight: 'bold',
+      fill: '#ffffff',
+      stroke: '#000000',
+      strokeWidth: 1,
+      textAnchor: 'middle',
+      dominantBaseline: 'middle',
+      filter: 'url(#textShadow)'
+    });
+  }
+
+  // Return SVG content
   return {
     content: generator.toSVG(),
     contentType: 'image/svg+xml'
@@ -171,84 +143,27 @@ async function generateGitHubImage(params: GitHubImageParams): Promise<{ content
 }
 
 /**
- * Create fallback simple image when GitHub API fails
+ * Adjust color brightness
+ */
+function adjustBrightness(color: string, amount: number): string {
+  // Simple brightness adjustment for hex colors
+  if (color.startsWith('#')) {
+    const hex = color.slice(1);
+    const num = parseInt(hex, 16);
+    const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+    const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+    const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+  }
+  return color;
+}
+
+/**
+ * Create fallback simple image when needed
  */
 async function generateFallbackImage(params: GitHubImageParams): Promise<{ content: string; contentType: string }> {
-  const { width, height, user } = params;
-  
-  const { getRandomGreeting } = await import('../utils/messages');
-  const { getRandomColor } = await import('../utils/helpers');
-  
-  const generator = new SVGImageGenerator(width, height);
-  const backgroundColor = getRandomColor();
-  
-  // Add drop shadow filter
-  generator.addDropShadowFilter('textShadow', 2, 2, 4, 0.5);
-  
-  // Set background
-  generator.setBackground(backgroundColor);
-  
-  // Get random greeting
-  const { language, message } = getRandomGreeting();
-  
-  // Calculate positions
-  const centerX = width / 2;
-  const centerY = height / 2;
-  
-  // Draw fallback message
-  generator.drawText('GitHub API Unavailable', centerX, centerY - 100, {
-    fontSize: 40,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
-    fill: '#ffffff',
-    stroke: '#000000',
-    strokeWidth: 2,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
-    filter: 'url(#textShadow)'
-  });
-  
-  // Draw greeting text
-  generator.drawText(message, centerX, centerY - 20, {
-    fontSize: 50,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
-    fill: '#ffffff',
-    stroke: '#000000',
-    strokeWidth: 2,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
-    filter: 'url(#textShadow)'
-  });
-  
-  // Draw language
-  generator.drawText(`(${language})`, centerX, centerY + 30, {
-    fontSize: 24,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
-    fill: '#ffffff',
-    stroke: '#000000',
-    strokeWidth: 1,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle'
-  });
-  
-  // Draw username
-  generator.drawText(user, centerX, centerY + 80, {
-    fontSize: 30,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
-    fill: '#ffffff',
-    stroke: '#000000',
-    strokeWidth: 1,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle'
-  });
-  
-  return {
-    content: generator.toSVG(),
-    contentType: 'image/svg+xml'
-  };
+  // Just use the main image generation function as fallback
+  return generateGitHubImage(params);
 }
 
 /**
@@ -258,26 +173,18 @@ export async function handleGitHubEndpoint(request: Request): Promise<Response> 
   try {
     const url = new URL(request.url);
     const params = parseGitHubParams(url);
-    
-    let result: { content: string; contentType: string };
-    
-    try {
-      // Try to generate advanced GitHub image
-      result = await generateGitHubImage(params);
-    } catch (error) {
-      console.error('Advanced GitHub image generation failed, using fallback:', error);
-      // Generate fallback image
-      result = await generateFallbackImage(params);
-    }
-    
-    // Create optimized response with appropriate caching
+
+    // Generate image
+    const { content, contentType } = await generateGitHubImage(params);
+
+    // Create optimized response with no caching for dynamic images
     const { createOptimizedResponse } = await import('../utils/performance');
-    return createOptimizedResponse(result.content, result.contentType, false);
-    
+    return createOptimizedResponse(content, contentType, false, {}, true);
+
   } catch (error) {
     console.error('Error generating GitHub image:', error);
-    
-    return new Response('Failed to generate GitHub greeting image', {
+
+    return new Response('Failed to generate image', {
       status: 500,
       headers: { 'Content-Type': 'text/plain' }
     });

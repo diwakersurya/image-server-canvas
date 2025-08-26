@@ -7,11 +7,12 @@ import { getRandomGreeting } from '../utils/messages';
 import { parseQueryParams, validateDimensions, validateColor } from '../utils/helpers';
 
 export interface SimpleImageParams {
-  user: string;
-  avatarUrl: string;
   backgroundColor: string;
   width: number;
   height: number;
+  animated?: boolean;
+  animateType?: 'color' | 'position' | 'opacity';
+  textAnimation?: boolean;
 }
 
 /**
@@ -19,99 +20,123 @@ export interface SimpleImageParams {
  */
 function parseImageParams(url: URL): SimpleImageParams {
   const params = parseQueryParams(url);
-  
-  const user = params.user || 'user';
-  const avatarUrl = params.avatarUrl || `https://github.com/${user}.png`;
+
   const backgroundColor = validateColor(params.bg || '#' + Math.floor(Math.random()*16777215).toString(16));
   const { w: width, h: height } = validateDimensions(params.w || '1200', params.h || '630');
+  const animated = params.animated === 'true';
+  const animateType = (params.animateType as 'color' | 'position' | 'opacity') || 'color';
+  const textAnimation = params.textAnimation !== 'false'; // Default to true
 
   return {
-    user,
-    avatarUrl,
     backgroundColor,
     width,
-    height
+    height,
+    animated,
+    animateType,
+    textAnimation
   };
 }
 
 /**
- * Generate simple greeting image using SVG
+ * Generate simple greeting image using SVG with optional animations
  */
 async function generateSimpleImage(params: SimpleImageParams): Promise<{ content: string; contentType: string }> {
-  const { width, height, backgroundColor, user } = params;
-  
+  const { width, height, backgroundColor, animated, animateType, textAnimation } = params;
+
   // Create SVG image generator
   const generator = new SVGImageGenerator(width, height);
-  
+
   // Add drop shadow filter for text
   generator.addDropShadowFilter('textShadow', 2, 2, 4, 0.5);
-  
-  // Set background with gradient for better visual appeal
-  const colors = [backgroundColor, adjustBrightness(backgroundColor, -20)];
-  generator.setGradientBackground(colors, 'vertical');
-  
+
+  // Set background - animated or static gradient
+  if (animated) {
+    // Generate random colors for animation
+    const colors = [
+      backgroundColor,
+      '#' + Math.floor(Math.random()*16777215).toString(16),
+      '#' + Math.floor(Math.random()*16777215).toString(16),
+      adjustBrightness(backgroundColor, -20)
+    ];
+
+    generator.setAnimatedGradientBackground({
+      colors,
+      direction: 'diagonal',
+      duration: 4,
+      repeatCount: 'indefinite',
+      animateType: animateType || 'color'
+    });
+  } else {
+    // Static gradient background
+    const colors = [backgroundColor, adjustBrightness(backgroundColor, -20)];
+    generator.setGradientBackground(colors, 'vertical');
+  }
+
   // Get random greeting
   const { language, message } = getRandomGreeting();
-  
+
   // Calculate positions
   const centerX = width / 2;
   const centerY = height / 2;
-  
-  // Draw main greeting text
-  generator.drawText(message, centerX, centerY - 50, {
-    fontSize: 70,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
-    fill: '#ffffff',
-    stroke: '#000000',
-    strokeWidth: 2,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
-    filter: 'url(#textShadow)'
-  });
-  
-  // Draw language text
-  generator.drawText(`(${language})`, centerX, centerY + 20, {
-    fontSize: 24,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
-    fill: '#ffffff',
-    stroke: '#000000',
-    strokeWidth: 1,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
-    filter: 'url(#textShadow)'
-  });
-  
-  // Draw user avatar placeholder (circular)
-  const avatarRadius = 50;
-  const avatarY = height - 150;
-  generator.drawCircle(centerX, avatarY, avatarRadius, {
-    fill: '#cccccc',
-    stroke: '#ffffff',
-    strokeWidth: 3
-  });
-  
-  // Draw user icon in avatar circle
-  generator.drawText('👤', centerX, avatarY, {
-    fontSize: 40,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle'
-  });
-  
-  // Draw username
-  generator.drawText(user, centerX, avatarY + 80, {
-    fontSize: 30,
-    fontFamily: 'Arial, sans-serif',
-    fontWeight: 'bold',
-    fill: '#ffffff',
-    stroke: '#000000',
-    strokeWidth: 1,
-    textAnchor: 'middle',
-    dominantBaseline: 'middle',
-    filter: 'url(#textShadow)'
-  });
-  
+
+  // Draw main greeting text - animated or static
+  if (animated && textAnimation) {
+    generator.drawAnimatedText(message, centerX, centerY - 50, {
+      fontSize: 70,
+      fontFamily: 'Arial, sans-serif',
+      fontWeight: 'bold',
+      fill: '#ffffff',
+      animation: {
+        type: 'fadeIn',
+        duration: 2,
+        delay: 0.5,
+        repeatCount: 1
+      }
+    });
+  } else {
+    generator.drawText(message, centerX, centerY - 50, {
+      fontSize: 70,
+      fontFamily: 'Arial, sans-serif',
+      fontWeight: 'bold',
+      fill: '#ffffff',
+      stroke: '#000000',
+      strokeWidth: 2,
+      textAnchor: 'middle',
+      dominantBaseline: 'middle',
+      filter: 'url(#textShadow)'
+    });
+  }
+
+  // Draw language text - animated or static
+  if (animated && textAnimation) {
+    generator.drawAnimatedText(`(${language})`, centerX, centerY + 20, {
+      fontSize: 24,
+      fontFamily: 'Arial, sans-serif',
+      fontWeight: 'bold',
+      fill: '#ffffff',
+      animation: {
+        type: 'scaleIn',
+        duration: 1.5,
+        delay: 1.5,
+        repeatCount: 1
+      }
+    });
+  } else {
+    generator.drawText(`(${language})`, centerX, centerY + 20, {
+      fontSize: 24,
+      fontFamily: 'Arial, sans-serif',
+      fontWeight: 'bold',
+      fill: '#ffffff',
+      stroke: '#000000',
+      strokeWidth: 1,
+      textAnchor: 'middle',
+      dominantBaseline: 'middle',
+      filter: 'url(#textShadow)'
+    });
+  }
+
+
+
   // Return SVG content
   return {
     content: generator.toSVG(),
@@ -146,9 +171,9 @@ export async function handleImageEndpoint(request: Request): Promise<Response> {
     // Generate image
     const { content, contentType } = await generateSimpleImage(params);
     
-    // Create optimized response with appropriate caching
+    // Create optimized response with no caching for dynamic images
     const { createOptimizedResponse } = await import('../utils/performance');
-    return createOptimizedResponse(content, contentType, false);
+    return createOptimizedResponse(content, contentType, false, {}, true);
     
   } catch (error) {
     console.error('Error generating simple image:', error);

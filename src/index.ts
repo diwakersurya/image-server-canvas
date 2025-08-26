@@ -63,6 +63,21 @@ async function handleGitHub(request: Request): Promise<Response> {
 }
 
 /**
+ * Handle /svg endpoint - animated SVG greeting image
+ */
+async function handleSVG(request: Request): Promise<Response> {
+  const { handleImageEndpoint } = await import("./handlers/image");
+  // Add animated=true parameter to the request URL
+  const url = new URL(request.url);
+  url.searchParams.set('animated', 'true');
+  url.searchParams.set('animateType', url.searchParams.get('animateType') || 'color');
+  url.searchParams.set('textAnimation', url.searchParams.get('textAnimation') || 'true');
+
+  const modifiedRequest = new Request(url.toString(), request);
+  return await handleImageEndpoint(modifiedRequest);
+}
+
+/**
  * Handle 404 errors
  */
 function handleNotFound(): Response {
@@ -147,6 +162,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
       case "/":
       case "/image":
         return await handleImage(request);
+
+      case "/svg":
+        return await handleSVG(request);
 
       case "/github":
         return await handleGitHub(request);
