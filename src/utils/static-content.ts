@@ -7,7 +7,7 @@
  */
 export function getContentType(filename: string): string {
   const ext = filename.split('.').pop()?.toLowerCase();
-  
+
   switch (ext) {
     case 'html':
       return 'text/html; charset=utf-8';
@@ -45,65 +45,7 @@ export function addCacheHeaders(response: Response, maxAge: number = 3600): Resp
 /**
  * Static file contents - bundled at build time
  */
-export const STATIC_FILES = {
-  '/': `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Generate greeting images with GitHub user data">
-    <title>Greeting Image Generator</title>
-    <link rel="stylesheet" href="/style.css">
-    <script src="/script.js" defer></script>
-  </head>
-  <body>
-    <header>
-      <h1>Greeting Image Generator</h1>
-    </header>
-
-    <main>
-      <h2>Generate Greeting Images</h2>
-      
-      <p>Create personalized greeting images with GitHub user data:</p>
-
-      <div class="endpoint-section">
-        <h3>Simple Greeting Image</h3>
-        <p>Generate a basic greeting image:</p>
-        <div class="example">
-          <a href="/image?user=octocat&bg=%23ff6b6b" target="_blank">
-            /image?user=octocat&bg=%23ff6b6b
-          </a>
-        </div>
-      </div>
-
-      <div class="endpoint-section">
-        <h3>GitHub Profile Greeting</h3>
-        <p>Generate an enhanced greeting with GitHub profile data:</p>
-        <div class="example">
-          <a href="/github?user=octocat" target="_blank">
-            /github?user=octocat
-          </a>
-        </div>
-      </div>
-
-      <div class="parameters">
-        <h3>Parameters</h3>
-        <ul>
-          <li><code>user</code> - GitHub username (default: "user")</li>
-          <li><code>bg</code> - Background color (default: random)</li>
-          <li><code>w</code> - Image width (default: 1200)</li>
-          <li><code>h</code> - Image height (default: 630)</li>
-        </ul>
-      </div>
-    </main>
-
-    <footer>
-      <p>Powered by <a href="https://workers.cloudflare.com/">Cloudflare Workers</a></p>
-    </footer>
-  </body>
-</html>`,
-
+export const STATIC_FILES: Record<string, string> = {
   '/style.css': `/* Greeting Image Generator Styles */
 
 * {
@@ -223,15 +165,15 @@ footer a:hover {
   body {
     padding: 1em 0.5em;
   }
-  
+
   main {
     padding: 1.5em;
   }
-  
+
   h1 {
     font-size: 2em;
   }
-  
+
   .endpoint-section {
     padding: 1em;
   }
@@ -244,27 +186,27 @@ console.log('Greeting Image Generator loaded');
 // Add click tracking for examples
 document.addEventListener('DOMContentLoaded', function() {
   const exampleLinks = document.querySelectorAll('.example a');
-  
+
   exampleLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       // Add loading indicator
       const originalText = this.textContent;
       this.textContent = 'Loading...';
-      
+
       // Reset text after a delay
       setTimeout(() => {
         this.textContent = originalText;
       }, 2000);
     });
   });
-  
+
   // Add form for custom parameters (future enhancement)
   addCustomForm();
 });
 
 function addCustomForm() {
   const main = document.querySelector('main');
-  
+
   const formSection = document.createElement('div');
   formSection.className = 'endpoint-section';
   formSection.innerHTML = \`
@@ -292,24 +234,24 @@ function addCustomForm() {
     </form>
     <div id="customResult" class="example" style="display: none;"></div>
   \`;
-  
+
   main.appendChild(formSection);
-  
+
   // Handle form submission
   document.getElementById('customForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const username = document.getElementById('username').value || 'octocat';
     const bgcolor = document.getElementById('bgcolor').value;
     const endpoint = document.getElementById('endpoint').value;
-    
+
     const params = new URLSearchParams({
       user: username,
       bg: bgcolor
     });
-    
+
     const url = \`/\${endpoint}?\${params.toString()}\`;
-    
+
     const resultDiv = document.getElementById('customResult');
     resultDiv.innerHTML = \`<a href="\${url}" target="_blank">\${url}</a>\`;
     resultDiv.style.display = 'block';
@@ -322,24 +264,24 @@ function addCustomForm() {
  */
 export async function serveStaticFile(path: string): Promise<Response | null> {
   const content = STATIC_FILES[path as keyof typeof STATIC_FILES];
-  
+
   if (!content) {
     return null;
   }
-  
+
   const contentType = getContentType(path);
   const response = new Response(content, {
     headers: { 'Content-Type': contentType }
   });
-  
+
   // Add optimized caching for static assets
   const { createOptimizedCacheHeaders } = await import('./performance');
   const isStatic = path !== '/';
   const cacheHeaders = createOptimizedCacheHeaders(contentType, isStatic);
-  
+
   Object.entries(cacheHeaders).forEach(([key, value]) => {
     response.headers.set(key, value);
   });
-  
+
   return response;
 }

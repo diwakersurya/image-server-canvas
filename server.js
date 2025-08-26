@@ -54,8 +54,52 @@ function nocache(req, res, next) {
 app.use(express.static("public"));
 
 // https://expressjs.com/en/starter/basic-routing.html
-app.get("/", (request, response) => {
-  response.sendFile(__dirname + "/views/index.html");
+app.get("/", nocache, async (request, response) => {
+  const {
+    user="user"/*username*/,
+    avatarUrl=`https://github.com/${user}.png`/*avatar url*/,
+    bg=getRandomColor()/* canvas background*/,
+    w=1200/*image width*/,
+    h=630/*image height*/
+  }=request.query;
+
+  const canvas = createCanvas(w, h);
+  const context = canvas.getContext("2d");
+
+  context.fillStyle = bg;
+  context.fillRect(0, 0, w, h);
+
+  /* setting the font and text alignment*/
+  context.font = "bold 70pt Menlo";
+  context.textAlign = "center";
+  context.textBaseline = "top";
+  /* getting randome message if random language*/
+  const randomIndex = getRandomInt(0, 50);
+  const language = Object.keys(messages)[randomIndex];
+  const text = messages[language];
+  const textWidth = context.measureText(text).width;
+  /*drawing text on canvas*/
+  context.fillStyle = "#fff";
+  context.fillText(text, 600, 170);
+  context.font = "bold 15pt Menlo";
+  context.fillText(`(${language})`, 600, 280);
+
+  context.fillStyle = "#fff";
+  context.font = "bold 30pt Menlo";
+  context.fillText(user, 600, 540);
+
+  context.beginPath();
+
+  /* loading image from github url*/
+  const myimg = await loadImage(avatarUrl);
+  context.arc(600, 500, 50, 0, 2 * Math.PI);
+  context.clip();
+  context.drawImage(myimg, 530, 450, myimg.width * 0.3, myimg.height * 0.3);
+
+  /*sending as response to client*/
+  const buffer = canvas.toBuffer("image/png");
+  response.contentType("image/jpeg");
+  response.send(buffer);
 });
 
 app.get("/image", nocache, async (request, response) => {

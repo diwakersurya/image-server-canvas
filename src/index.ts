@@ -144,6 +144,7 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
     // Handle API endpoints
     switch (path) {
+      case "/":
       case "/image":
         return await handleImage(request);
 
