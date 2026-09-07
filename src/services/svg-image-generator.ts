@@ -28,6 +28,17 @@ export interface AnimationOptions {
   easing?: 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out';
 }
 
+export interface ProfileBannerOptions {
+  user: string;
+  name: string;
+  language: string;
+  message: string;
+  status: string;
+  taglines: string[];
+  theme: 'aurora' | 'midnight' | 'sunrise';
+  animated: boolean;
+}
+
 export class SVGImageGenerator {
   private width: number;
   private height: number;
@@ -162,6 +173,89 @@ export class SVGImageGenerator {
     this.elements.push(`
       <rect width="100%" height="100%" fill="url(#${gradientId})"/>
     `);
+  }
+
+  /**
+   * Draw a self-contained, README-safe profile header. It uses only SVG and
+   * SMIL so it remains useful in GitHub's image sandbox without JavaScript.
+   */
+  drawProfileBanner(options: ProfileBannerOptions): void {
+    const palettes = {
+      aurora: ['#07152d', '#173b72', '#1f7a8c', '#8b5cf6'],
+      midnight: ['#080b14', '#172554', '#164e63', '#0f766e'],
+      sunrise: ['#32122b', '#7c2d4d', '#d95d39', '#f59e0b'],
+    };
+    const [base, left, right, accent] = palettes[options.theme];
+    const animations = options.animated ? `
+      <animateTransform attributeName="transform" type="translate"
+        values="-100,-45;110,40;-100,-45" dur="12s" repeatCount="indefinite"/>
+    ` : '';
+    const statusAnimation = options.animated ? `
+      <animate attributeName="r" values="7;10;7" dur="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;.45;1" dur="2.4s" repeatCount="indefinite"/>
+    ` : '';
+    const user = this.escapeXml(`@${options.user.replace(/^@+/, '')} · ${options.language}`);
+    const greetingText = `${options.message}, I’m ${options.name}`;
+    const greeting = this.escapeXml(greetingText);
+    const greetingSize = greetingText.length > 48 ? 32 : greetingText.length > 34 ? 38 : 44;
+    const status = this.escapeXml(options.status);
+    const taglineElements = options.taglines.map((tagline, index) => {
+      const animation = options.animated && options.taglines.length > 1
+        ? this.taglineAnimation(index, options.taglines.length)
+        : '';
+      return `<text x="116" y="258" fill="#dbeafe" font-family="Arial, sans-serif" font-size="25" opacity="${index === 0 ? '1' : '0'}" transform="translate(0, 0)">${this.escapeXml(tagline)}${animation}</text>`;
+    }).join('');
+
+    this.elements.unshift(`
+      <defs>
+        <linearGradient id="profile-background" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="${base}"/>
+          <stop offset="52%" stop-color="${left}"/>
+          <stop offset="100%" stop-color="${right}"/>
+        </linearGradient>
+        <filter id="profile-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="30"/>
+        </filter>
+      </defs>
+    `);
+    this.elements.push(`
+      <rect width="100%" height="100%" rx="24" fill="url(#profile-background)"/>
+      <g filter="url(#profile-glow)" opacity=".62" transform="translate(-100,-45)">
+        <circle cx="190" cy="90" r="150" fill="${accent}">${animations}</circle>
+        <circle cx="1010" cy="340" r="190" fill="${right}">${animations}</circle>
+      </g>
+      <rect x="72" y="66" width="5" height="266" rx="2.5" fill="${accent}"/>
+      <text x="116" y="122" fill="#ffffff" font-family="Arial, sans-serif" font-size="${greetingSize}" font-weight="700">${greeting}</text>
+      <text x="116" y="163" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="22">${user}</text>
+      ${taglineElements}
+      <circle cx="123" cy="310" r="7" fill="#6ee7b7">${statusAnimation}</circle>
+      <text x="143" y="318" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="20">${status}</text>
+      <text x="1084" y="318" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="18" text-anchor="end">GitHub profile</text>
+    `);
+  }
+
+  private taglineAnimation(index: number, count: number): string {
+    const cycle = count * 5;
+    const start = index / count;
+    const enter = start + 0.08 / count;
+    const exit = (index + 1) / count - 0.08 / count;
+    const end = (index + 1) / count;
+    const timeline = index === 0
+      ? {
+          opacityValues: '0;1;1;0;0',
+          transformValues: '0,12;0,0;0,0;0,-8;0,12',
+          keyTimes: `0;${enter};${exit};${end};1`,
+        }
+      : {
+          opacityValues: '0;0;1;1;0;0',
+          transformValues: '0,12;0,12;0,0;0,0;0,-8;0,12',
+          keyTimes: `0;${start};${enter};${exit};${end};1`,
+        };
+
+    return `
+      <animate attributeName="opacity" values="${timeline.opacityValues}" keyTimes="${timeline.keyTimes}" dur="${cycle}s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="${timeline.transformValues}" keyTimes="${timeline.keyTimes}" dur="${cycle}s" repeatCount="indefinite"/>
+    `;
   }
 
   /**

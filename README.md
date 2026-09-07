@@ -39,6 +39,24 @@ Generates an enhanced greeting image with GitHub profile data
 /github?user=octocat
 ```
 
+### `GET /profile`
+Generates a compact animated SVG banner intended for a GitHub profile README.
+It uses SMIL animation only, so it does not rely on JavaScript in the README.
+
+**Query Parameters:**
+- `user` - GitHub handle, without `@` (default: `developer`)
+- `name` - Display name shown after the randomly selected multilingual greeting
+- `status` - Short availability/status line
+- `taglines` - Up to three taglines separated by `|`; they rotate every five seconds
+- `theme` - `aurora` (default), `midnight`, or `sunrise`
+- `animated` - Set to `false` for a static, accessible first frame
+- `w`, `h` - Image dimensions (default: `1200×400`)
+
+**GitHub README embed:**
+```md
+<img src="https://YOUR-WORKER.example/profile?user=diwakersurya&name=Diwaker%20Singh&status=Currently%20crafting%20frontend%20%40%20SenseHQ&taglines=Building%20with%20web%2C%20cloud%2C%20and%20AI.|Turning%20ideas%20into%20developer%20experiences.&theme=aurora" alt="Animated profile banner for Diwaker Singh" />
+```
+
 ## Development
 
 ### Prerequisites

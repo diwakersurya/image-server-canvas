@@ -78,6 +78,14 @@ async function handleSVG(request: Request): Promise<Response> {
 }
 
 /**
+ * Handle /profile endpoint - animated GitHub README profile banner.
+ */
+async function handleProfile(request: Request): Promise<Response> {
+  const { handleProfileEndpoint } = await import("./handlers/profile");
+  return await handleProfileEndpoint(request);
+}
+
+/**
  * Handle 404 errors
  */
 function handleNotFound(): Response {
@@ -165,6 +173,9 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
       case "/svg":
         return await handleSVG(request);
+
+      case "/profile":
+        return await handleProfile(request);
 
       case "/github":
         return await handleGitHub(request);
