@@ -8,7 +8,7 @@ import { parseQueryParams, validateDimensions, validateColor } from '../utils/he
 export interface GitHubImageParams {
   width: number;
   height: number;
-  backgroundColor?: string;
+  backgroundColor: string;
   animated?: boolean;
   animateType?: 'color' | 'position' | 'opacity';
   textAnimation?: boolean;

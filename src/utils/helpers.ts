@@ -50,9 +50,9 @@ export function getGradientStops(stops: number): Record<number, string> {
 export function parseQueryParams(url: URL): Record<string, string> {
   const params: Record<string, string> = {};
   
-  for (const [key, value] of url.searchParams.entries()) {
+  url.searchParams.forEach((value, key) => {
     params[key] = value;
-  }
+  });
   
   return params;
 }
