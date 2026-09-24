@@ -3,7 +3,8 @@
  */
 
 export interface Env {
-  // Environment variables will be defined here
+  // Optional: raises GitHub API limit from 60 to 5000 req/hr (`wrangler secret put GITHUB_TOKEN`)
+  GITHUB_TOKEN?: string;
 }
 
 /**
@@ -179,6 +180,16 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
 
       case "/github":
         return await handleGitHub(request);
+
+      case "/folder": {
+        const { handleFolderEndpoint } = await import("./handlers/folder");
+        return await handleFolderEndpoint(request, env.GITHUB_TOKEN);
+      }
+
+      case "/folder/open": {
+        const { handleFolderOpenEndpoint } = await import("./handlers/folder");
+        return await handleFolderOpenEndpoint(request, env.GITHUB_TOKEN);
+      }
 
       default:
         return handleNotFound();

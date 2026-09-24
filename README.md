@@ -57,6 +57,23 @@ It uses SMIL animation only, so it does not rely on JavaScript in the README.
 <img src="https://YOUR-WORKER.example/profile?user=diwakersurya&name=Diwaker%20Singh&status=Currently%20crafting%20frontend%20%40%20SenseHQ&taglines=Building%20with%20web%2C%20cloud%2C%20and%20AI.|Turning%20ideas%20into%20developer%20experiences.&theme=aurora" alt="Animated profile banner for Diwaker Singh" />
 ```
 
+### `GET /folder`
+Folder card (SVG) for one of a user's 6 most recently pushed repos (forks excluded).
+
+**Query Parameters:**
+- `user` - GitHub username (required)
+- `n` - index `0`-`5`, `0` = most recent
+
+### `GET /folder/open`
+302 redirect to the repo shown by `/folder` with the same params.
+
+GitHub READMEs render images as `<img>`, so links inside an SVG can't be clicked. Wrap each card in a markdown link instead; the cards update themselves as you push:
+```md
+[![](https://<worker>/folder?user=octocat&n=0)](https://<worker>/folder/open?user=octocat&n=0)
+[![](https://<worker>/folder?user=octocat&n=1)](https://<worker>/folder/open?user=octocat&n=1)
+```
+Optional: `wrangler secret put GITHUB_TOKEN` raises the GitHub API limit from 60 to 5000 req/hr.
+
 ## Development
 
 ### Prerequisites

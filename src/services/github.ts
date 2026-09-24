@@ -151,6 +151,38 @@ export class GitHubService {
   }
 }
 
+export interface GitHubRepo {
+  name: string;
+  html_url: string;
+  description: string | null;
+  language: string | null;
+  stargazers_count: number;
+  fork: boolean;
+}
+
+/**
+ * Most recently pushed repos the user owns (forks excluded).
+ * Edge-cached for 10 min to stay under GitHub's rate limit.
+ */
+export async function getRecentRepos(username: string, count: number, token?: string): Promise<GitHubRepo[]> {
+  const headers: Record<string, string> = {
+    'User-Agent': 'Greeting-Image-Generator/1.0',
+    'Accept': 'application/vnd.github.v3+json'
+  };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const response = await fetch(
+    `https://api.github.com/users/${username}/repos?type=owner&sort=pushed&per_page=30`,
+    { headers, cf: { cacheTtl: 600, cacheEverything: true } }
+  );
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+  }
+
+  const repos: GitHubRepo[] = await response.json();
+  return repos.filter(repo => !repo.fork).slice(0, count);
+}
+
 /**
  * Default GitHub service instance
  */
