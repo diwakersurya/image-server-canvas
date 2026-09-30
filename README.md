@@ -65,7 +65,7 @@ Folder card (SVG) for one of a user's 6 most recently pushed repos (forks exclud
 - `n` - index `0`-`5`, `0` = most recent
 
 ### `GET /folder/open`
-302 redirect to the repo shown by `/folder` with the same params.
+302 redirect to the GitHub Pages site of the repo shown by `/folder` (same params), or to the repo itself when it has no Pages site.
 
 GitHub READMEs render images as `<img>`, so links inside an SVG can't be clicked. Wrap each card in a markdown link instead; the cards update themselves as you push:
 ```md

@@ -158,6 +158,8 @@ export interface GitHubRepo {
   language: string | null;
   stargazers_count: number;
   fork: boolean;
+  has_pages: boolean;
+  owner: { login: string };
 }
 
 /**

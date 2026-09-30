@@ -4,6 +4,7 @@
  * GitHub renders README images as <img>, so links inside an SVG never work.
  * Instead each card is its own image, wrapped in a markdown link:
  *   [![](/folder?user=x&n=0)](/folder/open?user=x&n=0)
+ * Clicks land on the repo's GitHub Pages site, falling back to the repo.
  * `n` is the index into the user's most recently pushed repos, so the
  * README stays static while the cards follow the latest projects.
  */
@@ -40,6 +41,17 @@ function escapeXml(text: string): string {
 
 function truncate(text: string, max: number): string {
   return text.length > max ? text.slice(0, max - 1) + '…' : text;
+}
+
+/**
+ * GitHub Pages URL when the repo publishes one, otherwise the repo itself.
+ * github.io redirects on to a custom domain if the repo has one configured.
+ */
+function repoLandingUrl(repo: GitHubRepo): string {
+  if (!repo.has_pages) return repo.html_url;
+  const host = `${repo.owner.login.toLowerCase()}.github.io`;
+  // A `<user>.github.io` repo is the user site, served from the root
+  return repo.name.toLowerCase() === host ? `https://${host}/` : `https://${host}/${repo.name}/`;
 }
 
 /**
@@ -111,7 +123,7 @@ export async function handleFolderEndpoint(request: Request, token?: string): Pr
 }
 
 /**
- * GET /folder/open?user=x&n=0 — redirect to the nth most recent repo
+ * GET /folder/open?user=x&n=0 — redirect to the nth most recent repo's Pages site (or the repo)
  */
 export async function handleFolderOpenEndpoint(request: Request, token?: string): Promise<Response> {
   const params = parseParams(new URL(request.url));
@@ -122,7 +134,7 @@ export async function handleFolderOpenEndpoint(request: Request, token?: string)
   let target = `https://github.com/${params.user}?tab=repositories`;
   try {
     const repo = (await getRecentRepos(params.user, MAX_CARDS, token))[params.n];
-    if (repo) target = repo.html_url;
+    if (repo) target = repoLandingUrl(repo);
   } catch (error) {
     console.error('Error fetching repos:', error);
   }
